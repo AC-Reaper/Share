@@ -56,14 +56,29 @@ void *worker(void *arg) {
     int i, j, k, tid, portion_size, row_start, row_end;
     double sum;
 
-    tid = *(int *) (arg); // get the thread ID assigned sequentially.
-    // add your code
+    tid = *(int *) (arg); // Get the thread ID assigned sequentially.
 
+    portion_size = size / num_threads; // Calculate the number of rows each thread should process.
+    row_start = tid * portion_size; // Calculate the starting row for this thread.
+    row_end = (tid + 1) * portion_size; // Calculate the ending row for this thread.
+
+    for (i = row_start; i < row_end; ++i) { // Loop over all rows assigned to this thread.
+        for (j = 0; j < size; ++j) { // Loop over all columns of matrix2 and rows of matrix3.
+            sum = 0;
+            for (k = 0; k < size; ++k) { // Multiply row by column.
+                sum += matrix1[i][k] * matrix2[k][j];
+            }
+            matrix3[i][j] = sum; // Store the result in matrix3.
+        }
+    }
+
+    free(arg); // Cleanup the dynamically allocated memory for the thread ID.
+
+    pthread_exit(0); // Exit the thread.
 }
 
 int main(int argc, char *argv[]) {
     int i;
-    double sum = 0;
     struct timeval tstart, tend;
     double exectime;
     pthread_t *threads;
@@ -124,3 +139,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
