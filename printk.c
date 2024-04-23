@@ -105,29 +105,39 @@ static int printk_write_num(char **out, long long i, int base, int sign,
 	int t, neg = 0, pc = 0;
 	unsigned long long u = i;
 
+	*s = '\0'; // Null-terminate the buffer
+
+	// Handle zero as a special case
 	if (i == 0) {
-		print_buf[0] = '0';
-		print_buf[1] = '\0';
-		return prints(out, print_buf, width, flags);
+	print_buf[0] = '0';
+	print_buf[1] = '\0';
+	return prints(out, print_buf, width, flags);
 	}
-
+	
+	// Handle negative numbers for signed types
 	if (sign && base == 10 && i < 0) {
-		neg = 1;
-		u = -i;
+	neg = 1;
+	u = -i; // Convert to unsigned equivalent
 	}
-	// TODO: fill your code here
-	// store the digitals in the buffer `print_buf`:
-	// 1. the last postion of this buffer must be '\0'
-	// 2. the format is only decided by `base` and `letbase` here
-
+	
+	// Convert the number to the specified base
+	do {
+	t = u % base;
+	u /= base;
+	if (t >= 10)
+	    t += letbase - '0' - 10; // Adjust for hex letters
+	*--s = t + '0';
+	} while (u);
+	
+	// If the number is negative, prepend a minus sign
 	if (neg) {
-		if (width && (flags & PAD_ZERO)) {
-			simple_outputchar(out, '-');
-			++pc;
-			--width;
-		} else {
-			*--s = '-';
-		}
+	if (width && (flags & PAD_ZERO)) {
+	    simple_outputchar(out, '-');
+	    pc++;
+	    width--;
+	} else {
+	    *--s = '-'; // Place minus sign at the start
+	}
 	}
 
 	return pc + prints(out, s, width, flags);
