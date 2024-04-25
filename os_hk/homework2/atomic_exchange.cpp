@@ -5,6 +5,7 @@
 
 std::atomic<bool> ready (false);
 std::atomic<bool> winner (false);
+int count = 1;
 
 void* count1m (void *arg) {
     int id = *(int*)arg;
@@ -12,6 +13,8 @@ void* count1m (void *arg) {
     for (int i=0; i<1000000; ++i) {}   // go!, count to 1 million
     if (!winner.exchange(true)) {
         std::cout << "thread #" << id << " won!\n";
+    }else {
+        std::cout << id << ": " << count++ << std::endl;
     }
     return NULL;
 };
