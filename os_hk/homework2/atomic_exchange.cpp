@@ -19,9 +19,11 @@ void* count1m (void *arg) {
 int main ()
 {
     pthread_t threadIDs[10];
+    int ids[10];
     std::cout << "spawning 10 threads that count to 1 million..." << std::endl;
     for(int i = 0; i < 10; i++) {
-        pthread_create(&threadIDs[i], NULL, count1m, (void*)&i);
+        ids[i] = i;
+        pthread_create(&threadIDs[i], NULL, count1m, (void*)&ids[i]);
     }
     ready = true;
     for(int i = 0; i < 10; i++) {
